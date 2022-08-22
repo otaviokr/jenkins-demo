@@ -1,0 +1,34 @@
+---
+version: "3.9"
+
+services:
+  jenkins:
+    build: setup
+    container_name: jenkins-demo
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    restart: on-failure
+    healthcheck:
+      test: curl -f http://localhost:8080/
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    environment:
+      - "JAVA_OPTS=-Dhudson.footerURL=http://github.com/otaviokr -Djenkins.install.runSetupWizard=false"
+    depends_on:
+      - mailhog
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: jenkins-demo-mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    healthcheck:
+      test: curl -f http://localhost:8025/
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
